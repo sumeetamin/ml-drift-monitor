@@ -1,38 +1,30 @@
 # ML Drift Monitor
 
-Compare numeric reference and current batches with PSI, two-sample KS, and missingness-change summaries.
+Compare a frozen reference distribution with a later batch using reference-quantile PSI, two-sample Kolmogorov–Smirnov statistics, and missingness rates. The output flags PSI at a configurable threshold; it does not claim that model quality changed.
 
-> **Portfolio prototype.** Source code is provided; no benchmark results are claimed until you run it on the cited data and record the output.
+## Real-data benchmark
 
-## Use case
+Uses the UCI Bike Sharing hourly dataset (dataset 275). Rows from 2011 form the reference (8,645 rows); 2012 forms the later comparison (8,734 rows). The original raw file SHA-256 is \`f52d7db575d4d8dd4633ab1e39d501e8cc77fc9e2f3352802afbfd0e8cb5bafa\`. The run monitors continuous weather variables and hourly ride count \`cnt\`; categorical calendar codes and the \`yr\` split marker are excluded.
 
-Compare numeric reference and current batches with PSI, two-sample KS, and missingness-change summaries. The CLI consumes local files, emits reproducible reports, and keeps data out of the repository.
+| Column | PSI | KS statistic | PSI alert at 0.20 |
+|---|---:|---:|---|
+| temp | 0.036 | 0.055 | No |
+| atemp | 0.033 | 0.046 | No |
+| hum | 0.048 | 0.065 | No |
+| windspeed | 0.004 | 0.019 | No |
+| cnt (target) | 0.244 | 0.216 | Yes |
 
-## Data and provenance
+The target distribution shifted above the heuristic PSI threshold while the four continuous weather inputs did not. This signals a distribution change for investigation; it does not establish why demand changed or whether a deployed model's error increased. The KS p-values are unadjusted and are not the alert rule. See [aggregate benchmark](reports/benchmark.json).
 
-Bring a frozen training/reference batch and a current production batch from your authorized pipeline.. Two CSV files with matching numeric feature columns. Do not mix different populations or schema versions without documenting the change. Source files are not bundled. Respect source terms and cite the dataset when publishing results.
+## Reproduce
 
-## Quick start
+Download UCI's [Bike Sharing dataset](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset), then split its hourly \`hour.csv\` by calendar year and run:
 
-```bash
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-# Download/prepare the source data locally, then run:
-python main.py --reference data/reference.csv --current data/current.csv --out outputs
-```
+\`\`\`bash
+python main.py --reference reference_2011.csv --current current_2012.csv \\
+  --columns temp,atemp,hum,windspeed,cnt \\
+  --reference-label "2011 training year" --current-label "2012 later year" \\
+  --psi-threshold 0.2 --out outputs
+\`\`\`
 
-## Outputs
-
-Generated results are saved under `outputs/`; file names and metrics are printed or documented by the CLI. The repository excludes downloaded data and artifacts.
-
-## Evaluation and operating notes
-
-Drift signals do not prove model degradation or reveal its cause. Freeze a representative reference set, correct for multiple comparisons, then validate performance against labeled outcomes.
-
-For production use, add a frozen reference period, out-of-time evaluation, monitoring ownership, and a documented rollback or escalation path. This project is a local baseline, not a deployed service.
-
-## License
-
-No code license file is included yet. Third-party data remains subject to its source terms.
+Use a frozen, representative reference and compare compatible schemas/populations. PSI cutoffs are heuristics; validate any alert with domain owners and labeled outcomes. A production monitor should track data quality, model performance, ownership, and rollback separately. Raw source data and row-level results are not committed.
