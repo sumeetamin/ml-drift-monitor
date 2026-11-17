@@ -1,0 +1,19 @@
+{
+  "reference_rows": 8645,
+  "current_rows": 8734,
+  "reference_label": "2011 training year",
+  "current_label": "2012 later year",
+  "psi_threshold": 0.2,
+  "columns": {
+    "temp": {"psi": 0.03550737978907738, "ks_statistic": 0.05462317081036424, "ks_pvalue": 1.0322560987218447e-11, "reference_missing_rate": 0.0, "current_missing_rate": 0.0, "alert": false},
+    "atemp": {"psi": 0.032876626124289876, "ks_statistic": 0.04620593512281171, "ks_pvalue": 1.6695126301618178e-08, "reference_missing_rate": 0.0, "current_missing_rate": 0.0, "alert": false},
+    "hum": {"psi": 0.04829644557640136, "ks_statistic": 0.06507880294172219, "ks_pvalue": 1.9097528224212298e-16, "reference_missing_rate": 0.0, "current_missing_rate": 0.0, "alert": false},
+    "windspeed": {"psi": 0.003569170292584941, "ks_statistic": 0.019241079747509438, "ks_pvalue": 0.07868467780516208, "reference_missing_rate": 0.0, "current_missing_rate": 0.0, "alert": false},
+    "cnt": {"psi": 0.24372056429642858, "ks_statistic": 0.2164736099112342, "ks_pvalue": 9.423870297582881e-179, "reference_missing_rate": 0.0, "current_missing_rate": 0.0, "alert": true}
+  },
+  "drifted_columns": ["cnt"],
+  "source_sha256": "f52d7db575d4d8dd4633ab1e39d501e8cc77fc9e2f3352802afbfd0e8cb5bafa",
+  "dataset": "UCI Bike Sharing hourly records",
+  "source_url": "https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset",
+  "limitations": "One temporal comparison is descriptive. PSI thresholds are heuristics; KS p-values are not corrected for multiple comparisons. Distribution shift alone does not establish model quality degradation or its cause."
+}
